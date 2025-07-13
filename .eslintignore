@@ -1,0 +1,10 @@
+node_modules/
+artifacts/
+cache/
+coverage/
+dist/
+deployments/
+typechain/
+typechain-types/
+*.min.js
+*.bundle.js
