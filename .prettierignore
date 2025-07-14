@@ -1,0 +1,12 @@
+node_modules
+artifacts
+cache
+coverage
+deployments
+dist
+typechain
+typechain-types
+*.env
+*.log
+package-lock.json
+.DS_Store
