@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Cultural Crowdfunding</title>
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iMTYiIGZpbGw9IiM2NjdlZWEiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" type="image/svg+xml">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #2d3748;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+            border: 1px solid #4a5568;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #f7fafc;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #cbd5e0;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: #1a202c;
+            color: #e2e8f0;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: #63b3ed;
+            border: 2px solid #4299e1;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.6);
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wallet-info {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: #63b3ed;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px solid #4299e1;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .project-card {
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            border-left: 5px solid #4299e1;
+            border: 1px solid #4a5568;
+        }
+
+        .project-header {
+            margin-bottom: 15px;
+        }
+
+        .project-title {
+            font-size: 1.4rem;
+            color: #f7fafc;
+            margin-bottom: 5px;
+        }
+
+        .project-category {
+            display: inline-block;
+            background: #4299e1;
+            color: #1a202c;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .project-description {
+            color: #cbd5e0;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .project-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a202c;
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #63b3ed;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #a0aec0;
+        }
+
+        .progress-bar {
+            background: #1a202c;
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+            border: 1px solid #4a5568;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-active { background: #48bb78; color: white; }
+        .status-successful { background: #38b2ac; color: white; }
+        .status-failed { background: #f56565; color: white; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            border: 1px solid #9ae6b4;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            background: #2d3748;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            border: 1px solid #4a5568;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #1a202c;
+            color: #cbd5e0;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: #2d3748;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Anonymous Cultural Crowdfunding</h1>
+            <p>Support cultural projects with complete privacy using encrypted contributions</p>
+        </div>
+
+        <div id="walletInfo" class="wallet-info" style="display: none;">
+            <p><strong>Connected:</strong> <span id="walletAddress"></span></p>
+            <p><strong>Balance:</strong> <span id="walletBalance"></span> ETH</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('browse')">🔍 Browse Projects</div>
+            <div class="tab" onclick="showTab('create')">➕ Create Project</div>
+            <div class="tab" onclick="showTab('contribute')">💝 Contribute</div>
+            <div class="tab" onclick="showTab('manage')">⚙️ Manage</div>
+        </div>
+
+        <div id="browseTab" class="tab-content active">
+            <div class="card">
+                <h2>📚 Cultural Projects</h2>
+                <div id="loadingProjects" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading cultural projects...</p>
+                </div>
+                <div id="projectsList" class="projects-grid" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div id="createTab" class="tab-content">
+            <div class="card">
+                <h2>🎨 Create Cultural Project</h2>
+                <form id="createProjectForm">
+                    <div class="form-group">
+                        <label>Project Title</label>
+                        <input type="text" id="projectTitle" placeholder="Enter your cultural project title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="projectCategory" required>
+                            <option value="">Select category</option>
+                            <option value="Visual Arts">🎨 Visual Arts</option>
+                            <option value="Music">🎵 Music</option>
+                            <option value="Literature">📚 Literature</option>
+                            <option value="Film">🎬 Film</option>
+                            <option value="Theater">🎭 Theater</option>
+                            <option value="Dance">💃 Dance</option>
+                            <option value="Digital Art">🖥️ Digital Art</option>
+                            <option value="Photography">📸 Photography</option>
+                            <option value="Crafts">🏺 Crafts</option>
+                            <option value="Community Culture">🏛️ Community Culture</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="projectDescription" rows="4" placeholder="Describe your cultural project and its impact" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Funding Target (ETH)</label>
+                        <input type="number" id="fundingTarget" step="0.01" min="0.01" placeholder="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Funding Period (Days)</label>
+                        <select id="fundingPeriod" required>
+                            <option value="7">1 Week</option>
+                            <option value="14">2 Weeks</option>
+                            <option value="30" selected>1 Month</option>
+                            <option value="60">2 Months</option>
+                            <option value="90">3 Months</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Details (IPFS Hash)</label>
+                        <input type="text" id="metadataHash" placeholder="QmXXXXX... (optional)">
+                    </div>
+
+                    <button type="submit" class="btn">🚀 Launch Cultural Project</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="contributeTab" class="tab-content">
+            <div class="card">
+                <h2>💝 Anonymous Contribution</h2>
+                <form id="contributeForm">
+                    <div class="form-group">
+                        <label>Project ID</label>
+                        <input type="number" id="contributeProjectId" min="1" placeholder="Enter project ID" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contribution Amount (ETH)</label>
+                        <input type="number" id="contributionAmount" step="0.001" min="0.001" placeholder="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Support Message (Optional)</label>
+                        <textarea id="supportMessage" rows="3" placeholder="Leave an anonymous message of support"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">❤️ Contribute Anonymously</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="manageTab" class="tab-content">
+            <div class="card">
+                <h2>⚙️ Project Management</h2>
+
+                <div class="form-group">
+                    <button onclick="loadMyProjects()" class="btn">📋 Load My Projects</button>
+                </div>
+
+                <div id="myProjectsList"></div>
+
+                <h3 style="margin: 30px 0 20px 0;">🔧 Project Actions</h3>
+
+                <div class="form-group">
+                    <label>Project ID</label>
+                    <input type="number" id="manageProjectId" min="1" placeholder="Enter project ID">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                    <button onclick="finalizeProject()" class="btn">⏰ Finalize Project</button>
+                    <button onclick="withdrawFunds()" class="btn">💰 Withdraw Funds</button>
+                    <button onclick="checkProjectStatus()" class="btn">📊 Check Status</button>
+                    <button onclick="requestRefund()" class="btn">🔄 Request Refund</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Contract configuration - Update this with your deployed contract address
+        const CONTRACT_ADDRESS = "0x659b4d354550ADCf46cf1392148DE42C16E8E8Da";
+
+        const CONTRACT_ABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint32",
+                        "name": "projectId",
+                        "type": "uint32"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "backer",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "AnonymousContributionMade",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint32",
+                        "name": "projectId",
+                        "type": "uint32"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    }
+                ],
+                "name": "FundsWithdrawn",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint32",
+                        "name": "projectId",
+                        "type": "uint32"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "category",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "deadline",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "ProjectCreated",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint32",
+                        "name": "projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "ProjectFailed",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint32",
+                        "name": "projectId",
+                        "type": "uint32"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    }
+                ],
+                "name": "ProjectFunded",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint32",
+                        "name": "projectId",
+                        "type": "uint32"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "backer",
+                        "type": "address"
+                    }
+                ],
+                "name": "RefundProcessed",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "backerProjects",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_supportMessage",
+                        "type": "string"
+                    }
+                ],
+                "name": "contributeAnonymously",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "contributions",
+                "outputs": [
+                    {
+                        "internalType": "euint64",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "refunded",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "supportMessage",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_category",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "_targetAmount",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "_fundingPeriod",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_metadataHash",
+                        "type": "string"
+                    }
+                ],
+                "name": "createProject",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "creatorProjects",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "emergencyPause",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "finalizeProject",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_backer",
+                        "type": "address"
+                    }
+                ],
+                "name": "getBackerProjects",
+                "outputs": [
+                    {
+                        "internalType": "uint32[]",
+                        "name": "",
+                        "type": "uint32[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "_backer",
+                        "type": "address"
+                    }
+                ],
+                "name": "getContribution",
+                "outputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "encryptedAmount",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "refunded",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "supportMessage",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_creator",
+                        "type": "address"
+                    }
+                ],
+                "name": "getCreatorProjects",
+                "outputs": [
+                    {
+                        "internalType": "uint32[]",
+                        "name": "",
+                        "type": "uint32[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getPlatformStats",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "totalProjects",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "activeProjects",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "successfulProjects",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "failedProjects",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "getProject",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "category",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "deadline",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "enum AnonymousCulturalCrowdfunding.ProjectStatus",
+                        "name": "status",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "createdAt",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "backerCount",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "metadataHash",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "getProjectAmounts",
+                "outputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "encryptedTarget",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "encryptedCurrent",
+                        "type": "bytes32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "MAX_FUNDING_PERIOD",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "MIN_FUNDING_PERIOD",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "requestId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "currentAmount",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "targetAmount",
+                        "type": "uint64"
+                    }
+                ],
+                "name": "processFinalization",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "requestId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "currentAmount",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "targetAmount",
+                        "type": "uint64"
+                    }
+                ],
+                "name": "processGoalCheck",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "requestId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "refundAmount",
+                        "type": "uint64"
+                    }
+                ],
+                "name": "processRefund",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "projectBackers",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "projectCounter",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "projects",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "category",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "euint64",
+                        "name": "targetAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "euint64",
+                        "name": "currentAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "deadline",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "enum AnonymousCulturalCrowdfunding.ProjectStatus",
+                        "name": "status",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "fundsWithdrawn",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "createdAt",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "backerCount",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "metadataHash",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "requestRefund",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "_projectId",
+                        "type": "uint32"
+                    }
+                ],
+                "name": "withdrawFunds",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        let provider, signer, contract, userAddress;
+
+        // Initialize the application
+        async function init() {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await connectWallet();
+
+                    if (CONTRACT_ADDRESS !== "") {
+                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                        await loadProjects();
+                    } else {
+                        showMessage("Please deploy the contract and update CONTRACT_ADDRESS", "error");
+                    }
+                } else {
+                    showMessage("Please install MetaMask to use this application", "error");
+                }
+            } catch (error) {
+                console.error("Initialization error:", error);
+                showMessage("Failed to initialize application: " + error.message, "error");
+            }
+        }
+
+        // Connect wallet
+        async function connectWallet() {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                const balance = await provider.getBalance(userAddress);
+
+                document.getElementById('walletAddress').textContent = userAddress.substring(0, 10) + "...";
+                document.getElementById('walletBalance').textContent = ethers.utils.formatEther(balance);
+                document.getElementById('walletInfo').style.display = 'block';
+
+                console.log("Wallet connected:", userAddress);
+            } catch (error) {
+                console.error("Wallet connection failed:", error);
+                showMessage("Failed to connect wallet: " + error.message, "error");
+            }
+        }
+
+        // Show/hide tabs
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+
+            // Load data if needed
+            if (tabName === 'browse') {
+                loadProjects();
+            }
+        }
+
+        // Create project form handler
+        document.getElementById('createProjectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            try {
+                const title = document.getElementById('projectTitle').value;
+                const category = document.getElementById('projectCategory').value;
+                const description = document.getElementById('projectDescription').value;
+                const targetAmount = document.getElementById('fundingTarget').value;
+                const fundingPeriod = parseInt(document.getElementById('fundingPeriod').value);
+                const metadataHash = document.getElementById('metadataHash').value || "QmDefault";
+
+                showMessage("Creating project... Please confirm the transaction", "info");
+
+                // Convert target amount to wei
+                const targetAmountWei = ethers.utils.parseEther(targetAmount);
+                const fundingPeriodSeconds = fundingPeriod * 24 * 60 * 60;
+
+                const tx = await contract.createProject(
+                    title,
+                    description,
+                    category,
+                    targetAmountWei,
+                    fundingPeriodSeconds,
+                    metadataHash
+                );
+
+                await tx.wait();
+                showMessage("🎉 Project created successfully!", "success");
+
+                // Reset form
+                document.getElementById('createProjectForm').reset();
+
+                // Reload projects
+                setTimeout(() => {
+                    loadProjects();
+                }, 2000);
+
+            } catch (error) {
+                console.error("Project creation failed:", error);
+                showMessage("Failed to create project: " + error.message, "error");
+            }
+        });
+
+        // Contribute form handler
+        document.getElementById('contributeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            try {
+                const projectId = document.getElementById('contributeProjectId').value;
+                const amount = document.getElementById('contributionAmount').value;
+                const message = document.getElementById('supportMessage').value;
+
+                showMessage("Processing contribution... Please confirm the transaction", "info");
+
+                const amountWei = ethers.utils.parseEther(amount);
+
+                const tx = await contract.contributeAnonymously(
+                    projectId,
+                    message,
+                    { value: amountWei }
+                );
+
+                await tx.wait();
+                showMessage("❤️ Contribution submitted anonymously!", "success");
+
+                // Reset form
+                document.getElementById('contributeForm').reset();
+
+                // Reload projects
+                setTimeout(() => {
+                    loadProjects();
+                }, 2000);
+
+            } catch (error) {
+                console.error("Contribution failed:", error);
+                showMessage("Failed to contribute: " + error.message, "error");
+            }
+        });
+
+        // Load and display projects
+        async function loadProjects() {
+            try {
+                if (!contract) return;
+
+                document.getElementById('loadingProjects').style.display = 'block';
+                document.getElementById('projectsList').style.display = 'none';
+
+                const stats = await contract.getPlatformStats();
+                const totalProjects = Number(stats[0]);
+
+                const projectsHtml = [];
+
+                for (let i = 1; i <= totalProjects && i <= 20; i++) {
+                    try {
+                        const project = await contract.getProject(i);
+
+                        const deadline = new Date(Number(project[4]) * 1000);
+                        const isActive = project[5] === 0; // ProjectStatus.Active
+                        const timeLeft = Math.max(0, deadline.getTime() - Date.now());
+                        const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+
+                        const statusClass = isActive ? 'status-active' :
+                                          project[5] === 1 ? 'status-successful' : 'status-failed';
+                        const statusText = isActive ? 'Active' :
+                                         project[5] === 1 ? 'Successful' : 'Failed';
+
+                        projectsHtml.push(`
+                            <div class="project-card">
+                                <div class="project-header">
+                                    <h3 class="project-title">${project[0]}</h3>
+                                    <span class="project-category">${project[2]}</span>
+                                </div>
+
+                                <p class="project-description">${project[1]}</p>
+
+                                <div class="project-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value">${project[7].toString()}</div>
+                                        <div class="stat-label">Backers</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${daysLeft}</div>
+                                        <div class="stat-label">Days Left</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="status-badge ${statusClass}">${statusText}</span>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 15px;">
+                                    <small style="color: #718096;">
+                                        Project ID: ${i} |
+                                        Creator: ${project[3].substring(0, 10)}... |
+                                        Created: ${new Date(Number(project[6]) * 1000).toLocaleDateString()}
+                                    </small>
+                                </div>
+
+                                ${isActive ? `
+                                    <button onclick="quickContribute(${i})" class="btn" style="margin-top: 15px;">
+                                        💝 Support This Project
+                                    </button>
+                                ` : ''}
+                            </div>
+                        `);
+                    } catch (error) {
+                        console.log(`Error loading project ${i}:`, error.message);
+                    }
+                }
+
+                document.getElementById('projectsList').innerHTML = projectsHtml.join('');
+                document.getElementById('loadingProjects').style.display = 'none';
+                document.getElementById('projectsList').style.display = 'grid';
+
+            } catch (error) {
+                console.error("Failed to load projects:", error);
+                showMessage("Failed to load projects: " + error.message, "error");
+                document.getElementById('loadingProjects').style.display = 'none';
+            }
+        }
+
+        // Quick contribute function
+        function quickContribute(projectId) {
+            showTab('contribute');
+            document.getElementById('contributeProjectId').value = projectId;
+        }
+
+        // Load user's projects
+        async function loadMyProjects() {
+            try {
+                if (!contract || !userAddress) return;
+
+                const myProjects = await contract.getCreatorProjects(userAddress);
+                const myProjectsHtml = [];
+
+                for (let projectId of myProjects) {
+                    const project = await contract.getProject(projectId);
+                    const statusText = project[5] === 0 ? 'Active' :
+                                     project[5] === 1 ? 'Successful' :
+                                     project[5] === 2 ? 'Failed' : 'Withdrawn';
+
+                    myProjectsHtml.push(`
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <h4>${project[0]}</h4>
+                            <p>ID: ${projectId} | Status: ${statusText} | Backers: ${project[7]}</p>
+                        </div>
+                    `);
+                }
+
+                document.getElementById('myProjectsList').innerHTML = myProjectsHtml.join('') ||
+                    '<p style="text-align: center; color: #718096;">No projects found</p>';
+
+            } catch (error) {
+                console.error("Failed to load my projects:", error);
+                showMessage("Failed to load your projects: " + error.message, "error");
+            }
+        }
+
+        // Management functions
+        async function finalizeProject() {
+            const projectId = document.getElementById('manageProjectId').value;
+            if (!projectId) {
+                showMessage("Please enter a project ID", "error");
+                return;
+            }
+
+            try {
+                showMessage("Finalizing project... Please confirm the transaction", "info");
+                const tx = await contract.finalizeProject(projectId);
+                await tx.wait();
+                showMessage("✅ Project finalized successfully!", "success");
+            } catch (error) {
+                console.error("Finalization failed:", error);
+                showMessage("Failed to finalize project: " + error.message, "error");
+            }
+        }
+
+        async function withdrawFunds() {
+            const projectId = document.getElementById('manageProjectId').value;
+            if (!projectId) {
+                showMessage("Please enter a project ID", "error");
+                return;
+            }
+
+            try {
+                showMessage("Withdrawing funds... Please confirm the transaction", "info");
+                const tx = await contract.withdrawFunds(projectId);
+                await tx.wait();
+                showMessage("💰 Funds withdrawn successfully!", "success");
+            } catch (error) {
+                console.error("Withdrawal failed:", error);
+                showMessage("Failed to withdraw funds: " + error.message, "error");
+            }
+        }
+
+        async function checkProjectStatus() {
+            const projectId = document.getElementById('manageProjectId').value;
+            if (!projectId) {
+                showMessage("Please enter a project ID", "error");
+                return;
+            }
+
+            try {
+                const project = await contract.getProject(projectId);
+                const statusText = project[5] === 0 ? 'Active' :
+                                 project[5] === 1 ? 'Successful' :
+                                 project[5] === 2 ? 'Failed' : 'Withdrawn';
+
+                showMessage(`📊 Project Status: ${statusText} | Backers: ${project[7]} | Deadline: ${new Date(Number(project[4]) * 1000).toLocaleDateString()}`, "info");
+            } catch (error) {
+                console.error("Status check failed:", error);
+                showMessage("Failed to check project status: " + error.message, "error");
+            }
+        }
+
+        async function requestRefund() {
+            const projectId = document.getElementById('manageProjectId').value;
+            if (!projectId) {
+                showMessage("Please enter a project ID", "error");
+                return;
+            }
+
+            try {
+                showMessage("Requesting refund... Please confirm the transaction", "info");
+                const tx = await contract.requestRefund(projectId);
+                await tx.wait();
+                showMessage("🔄 Refund requested successfully!", "success");
+            } catch (error) {
+                console.error("Refund request failed:", error);
+                showMessage("Failed to request refund: " + error.message, "error");
+            }
+        }
+
+        // Utility functions
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error-message' :
+                                  type === 'success' ? 'success-message' : 'wallet-info';
+            messageDiv.innerHTML = `<p>${message}</p>`;
+
+            document.body.insertBefore(messageDiv, document.body.firstChild);
+
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Initialize app when page loads
+        window.addEventListener('load', init);
+
+        // Handle account changes
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    location.reload();
+                } else {
+                    connectWallet();
+                }
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>
