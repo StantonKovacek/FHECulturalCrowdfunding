@@ -4,7 +4,7 @@ A privacy-preserving crowdfunding platform for cultural projects built on Fully 
 
 ## 🌐 Live Demo
 
-**Live Application**: https://anonymous-cultural-crowdfunding.vercel.app/
+**Live Application**: https://fhe-cultural-crowdfunding.vercel.app/
 
 **Demo Video**: Download and view `demo.mp4` file in this repository for a complete walkthrough
 
@@ -136,7 +136,7 @@ The demo video demonstrates:
 
 ## 🔗 Links
 
-**Live Application**: https://anonymous-cultural-crowdfunding.vercel.app/
+**Live Application**: https://fhe-cultural-crowdfunding.vercel.app/
 
 **GitHub Repository**: https://github.com/StantonKovacek/FHECulturalCrowdfunding
 
